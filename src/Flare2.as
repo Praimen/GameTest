@@ -4,12 +4,14 @@ package
 	import flare.basic.*;
 	import flare.collisions.*;
 	import flare.core.*;
+	import flare.primitives.ShadowPlane;
 	import flare.system.*;
 	import flare.utils.*;
 	
 	import flash.display.*;
 	import flash.events.*;
-	import flash.geom.*; 
+	import flash.geom.*;
+	import flash.utils.*;
 
 	
 	public class Flare2 extends Sprite
@@ -26,6 +28,10 @@ package
 		private var moving:Boolean = false;
 		private var mouse:MouseCollision;
 		
+		private var plane:ShadowPlane;
+		private var light:Light3D;
+		
+		private var debug:Boolean = true;
 		private var levelTest:Boolean = true;
 
 		public function Flare2() 
@@ -65,12 +71,26 @@ package
 		{
 			
 			//level.scaleX = level.scaleY = level.scaleZ = 0.50;
-			level.getChildByName("tavern").rotateZ(90);
+			//level.getChildByName("tavern").rotateZ(90);
+			
+			
 			biped = scene.getChildByName( "draken_run_labels.f3d" );
 			//biped.scaleX = biped.scaleY = biped.scaleZ = 0.25;
-			biped.y = 0;
+			biped.y = 50;
 			biped.x = 300;
-			// Resets 3d object scales and rotations. This method must not be used with objects that include animations.
+			
+
+			// create the light.
+			light = new Light3D( "", Light3D.POINT_LIGHT );
+			
+			// set the light as default light.
+			Device3D.defaultLight = light;
+			
+			// create the shadow plane.
+			plane = new ShadowPlane( "shadowmap", scene, light, 2300, 2300, 256, 256 );
+			plane.setPriority( -100 );
+			plane.alpha = 0.2;
+			scene.addChild( plane );
 			 
 			// Trace imported info for the scene	
 			//Pivot3DUtils.traceInfo( scene ); 
@@ -79,22 +99,26 @@ package
 			biped.addLabel( "run", 1, 40 );
 			biped.addLabel( "idle", 45, 60 );
 			if (levelTest){
-				Pivot3DUtils.resetXForm( level )
+				Pivot3DUtils.resetXForm( level );
+				//Pivot3DUtils.subdivide( floor, 500 )
 				collisions = new SphereCollision( biped, 50, new Vector3D( 0, 50, 0 ) ); 
 				collisions.addCollisionWith( level );
 				
-				mouse = new MouseCollision( scene.camera, scene.canvas );           
+								            
+			
+			}
+			
+			if (debug){
+				// force Debug3D to draw over all objects.
+				//Debug3D.priority = Number.MAX_VALUE;
+				/*mouse = new MouseCollision( scene.camera, scene.canvas );           
 				mouse.addCollisionWith( level );
-				mouse.addCollisionWith( biped );
-				            
-				 // force Debug3D to draw over all objects.
-				Debug3D.priority = Number.MAX_VALUE;
-				             
+				mouse.addCollisionWith( biped );*/
 				// draw Debug3D axis.
-				Debug3D.drawAxis( scene, 5, true );
-				             
+				Debug3D.drawAxis( scene, 0, false );
+				
 				// we only need to test in render event, but we can test also in update event.
-				scene.addEventListener( Scene3D.RENDER_EVENT, renderEvent );
+				//scene.addEventListener( Scene3D.RENDER_EVENT, renderEvent );
 			}
 			
 			// for smooth animation when the frameSpeed property is less than 1.
@@ -105,23 +129,27 @@ package
 		}
 		
 		
+		
+		
 		private function renderEvent(e:Event):void 
 		{
 			// remove Debug3D data.
-			Debug3D.removeBoundingBox( scene, true )
-			Debug3D.removePoly( scene, true )
+			Debug3D.removeBoundingBox( scene, true );
+			Debug3D.removePoly( scene, true );
+			
+			
 			
 			// get mouse collision.
-			if ( mouse.test( Input3D.mouseX, Input3D.mouseY ) )
+		/*	if ( mouse.test( Input3D.mouseX, Input3D.mouseY ) )
 			{	
 				// get collision data.
-				var info:CollisionInfo = mouse.data[ 0 ]
+				var info:CollisionInfo = mouse.data[ 0 ];
 				
 				// draw Debug3D data.
-				Debug3D.priority = 1
-				Debug3D.drawBoundingBox( info.mesh )
-				Debug3D.drawPoly( info.mesh, info.poly )
-			}
+				Debug3D.priority = 1;
+				Debug3D.drawBoundingBox( info.mesh );
+				Debug3D.drawPoly( info.mesh, info.poly );
+			}*/
 		}
 
 		
@@ -151,7 +179,7 @@ package
 			
 			trace("list of key array:"+"\n UP: "+keyArray["up"]+"\n DOWN: "+keyArray["down"]+"\n RIGHT: "+keyArray["right"]+"\n LEFT: "+keyArray["left"]);
 			
-			if(keyArray["up"] == 0 && keyArray["down"] == 0 && keyArray["right"] == 0 && keyArray["left"] == 0){
+			if((keyArray["up"] + keyArray["down"] + keyArray["right"]+ keyArray["left"]) == 0){
 				trace("all movment is false");
 				runIdle();	
 			}
@@ -169,6 +197,9 @@ package
 		
 		private function updateEvent(e:Event):void{
 			
+			light.x = 100;//Math.sin( getTimer() / 1000 ) * 200;
+			light.z = 100;//Math.cos( getTimer() / 1500 ) * 200;
+			light.y = 250;
 			
 			if(Input3D.keyHit( Input3D.W ) || 
 				Input3D.keyHit( Input3D.S ) || 
