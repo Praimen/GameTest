@@ -13,7 +13,7 @@ package
 	import flash.geom.*;
 	import flash.utils.*;
 
-	
+	[SWF(backgroundColor="#FFFFFF", frameRate="60", width="600", height="600")]
 	public class Flare2 extends Sprite
 	{
 		private var scene:Scene3D;
@@ -54,7 +54,17 @@ package
 			// loads the animated character.
 			if (levelTest){
 				level = scene.addChildFromFile( "tavern.f3d" );
+				// create the light.
+				light = new Light3D( "", Light3D.POINT_LIGHT );
 				
+				// set the light as default light.
+				Device3D.defaultLight = light;
+				Device3D.smoothMaterials = true;
+				// create the shadow plane.
+				plane = new ShadowPlane( "shadowmap", scene, light, 4300, 4300, 512, 512 );
+				plane.setPriority( -200 );
+				plane.alpha = 0.2;
+				scene.addChild( plane );	
 			}
 			scene.addChildFromFile( "draken_run_labels.f3d" );
 			stage.addEventListener(KeyboardEvent.KEY_UP, playIdle);
@@ -73,37 +83,30 @@ package
 			//level.scaleX = level.scaleY = level.scaleZ = 0.50;
 			//level.getChildByName("tavern").rotateZ(90);
 			
-			
+		
 			biped = scene.getChildByName( "draken_run_labels.f3d" );
 			//biped.scaleX = biped.scaleY = biped.scaleZ = 0.25;
-			biped.y = 50;
-			biped.x = 300;
+			//biped.y = 50;
+			biped.x = 800;
 			
 
-			// create the light.
-			light = new Light3D( "", Light3D.POINT_LIGHT );
 			
-			// set the light as default light.
-			Device3D.defaultLight = light;
-			
-			// create the shadow plane.
-			plane = new ShadowPlane( "shadowmap", scene, light, 2300, 2300, 256, 256 );
-			plane.setPriority( -100 );
-			plane.alpha = 0.2;
-			scene.addChild( plane );
 			 
 			// Trace imported info for the scene	
-			//Pivot3DUtils.traceInfo( scene ); 
+			Pivot3DUtils.traceInfo( scene ); 
 			
 			// add some labels. ( the labels also can be defined in 3DMax ).
 			biped.addLabel( "run", 1, 40 );
-			biped.addLabel( "idle", 45, 60 );
+			biped.addLabel( "idle", 50, 60 );
 			if (levelTest){
 				Pivot3DUtils.resetXForm( level );
 				//Pivot3DUtils.subdivide( floor, 500 )
 				collisions = new SphereCollision( biped, 50, new Vector3D( 0, 50, 0 ) ); 
 				collisions.addCollisionWith( level );
 				
+				light.x = 500;//Math.sin( getTimer() / 1000 ) * 200;
+				light.z = 550;//Math.cos( getTimer() / 1500 ) * 200;
+				light.y = 1050;
 								            
 			
 			}
@@ -197,9 +200,7 @@ package
 		
 		private function updateEvent(e:Event):void{
 			
-			light.x = 100;//Math.sin( getTimer() / 1000 ) * 200;
-			light.z = 100;//Math.cos( getTimer() / 1500 ) * 200;
-			light.y = 250;
+			
 			
 			if(Input3D.keyHit( Input3D.W ) || 
 				Input3D.keyHit( Input3D.S ) || 
@@ -247,7 +248,7 @@ package
 			
 			
 			// set the camera position relative to the player.	
-			Pivot3DUtils.setPositionWithReference( scene.camera, 0, 100, 600, biped, 0.1 );	
+			Pivot3DUtils.setPositionWithReference( scene.camera, 0, 400, 600, biped, 0.1 );	
 				
 			// orientate the camera to player position.
 			Pivot3DUtils.lookAtWithReference( scene.camera, 0, 100, 0, biped );
