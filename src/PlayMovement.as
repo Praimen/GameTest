@@ -113,7 +113,7 @@ package
 		}
 		
 		
-		private function runIdle():void{
+		public function runIdle():void{
 			trace("run idle");
 			
 			_player.frameSpeed = .1;

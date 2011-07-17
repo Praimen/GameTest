@@ -38,8 +38,8 @@ package{
 			moveControl.move();
 		}
 		
-		public function initAnim(start:int):void{
-			_player.gotoAndStop(start);
+		public function initAnim():void{
+			moveControl.runIdle();
 		}
 		
 		public function get player():Pivot3D{
