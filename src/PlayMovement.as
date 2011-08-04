@@ -1,11 +1,23 @@
 package
 {
+	import com.smartfoxserver.v2.*;
+	import com.smartfoxserver.v2.SmartFox;
+	import com.smartfoxserver.v2.core.SFSEvent;
+	import com.smartfoxserver.v2.entities.*;
+	import com.smartfoxserver.v2.entities.data.*;
+	import com.smartfoxserver.v2.entities.variables.SFSUserVariable;
+	import com.smartfoxserver.v2.exceptions.SFSError;
+	import com.smartfoxserver.v2.requests.*;
+	
 	import flare.core.Pivot3D;
 	import flare.system.*;
 	import flare.utils.*;
 	
 	import flash.display.*;
 	import flash.events.KeyboardEvent;
+	import flash.events.TimerEvent;
+	import flash.utils.Timer;
+	
 	import org.casalib.util.StageReference;
 
 	public class PlayMovement {
@@ -13,9 +25,14 @@ package
 		private var _player:Pivot3D;
 		private var _playerBase:Player;	
 		private var keyArray:Array;
+		private var _server:Server;
 		
-		public function PlayMovement(player:Player)
+		private var intervalTimer:Timer = new Timer(500);
+		
+		public function PlayMovement(player:Player, clientServer:Server)
 		{
+			_server = clientServer;
+			
 			keyArray = [];
 			keyArray["up"] = 0;
 			keyArray["down"] = 0;
@@ -24,16 +41,20 @@ package
 			_playerBase = player;
 			_player = player.player;
 			StageReference.getStage().addEventListener(KeyboardEvent.KEY_UP, playIdle);	
-		
+			intervalTimer.addEventListener(TimerEvent.TIMER,updateServer);
+			intervalTimer.start();
+			
 			
 		}
 		
 		public function forward():void{
-			
+			//all of the playerBase animationSpeed and movement Speeds need to be reversed so that player pulls information
+			//fromt this class and the classe is not dependant on playerBase
 			if (Input3D.keyDown( Input3D.W )){
 				keyArray["up"]=1;
 				_player.frameSpeed = _playerBase.animationSpeed ;
-				_player.translateZ( -_playerBase.movementSpeed  ) ;					
+				_player.translateZ( -_playerBase.movementSpeed  ) ;	
+				
 			}	
 		}
 		
@@ -69,7 +90,8 @@ package
 				Input3D.keyHit( Input3D.S ) || 
 				Input3D.keyHit( Input3D.D ) ||
 				Input3D.keyHit( Input3D.A ) ){				
-				_player.playLabel( "run" ) ;					
+				_player.playLabel( "run" ) ;				
+				
 			}
 			
 			forward();
@@ -112,6 +134,14 @@ package
 			
 		}
 		
+		private function updateServer(timerEvt:TimerEvent):void{	
+			var posVars:Array = new Array()
+				
+			posVars.push(new SFSUserVariable(_server.PLAYER_X, int(_player.x)));
+			posVars.push(new SFSUserVariable(_server.PLAYER_Y, int(_player.y)));	
+			posVars.push(new SFSUserVariable(_server.PLAYER_Z, int(_player.z)));			
+			_server.sfs.send(new SetUserVariablesRequest(posVars));
+		}
 		
 		public function runIdle():void{
 			trace("run idle");

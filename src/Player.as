@@ -2,6 +2,7 @@ package{
 	import flare.collisions.SphereCollision;
 	import flare.core.*;
 	
+	import flash.geom.Point;
 	import flash.geom.Vector3D;
 
 	public class Player extends Pivot3D	{
@@ -9,24 +10,29 @@ package{
 		private var _player:Pivot3D;
 		private var collisions:SphereCollision;
 		
+		
+		private var playerPos:Vector3D = new Vector3D(850,0,0);
+		
 		private var animSpeed:Number = 1.5;
 		private var moveSpeed:Number = 20;
 		private var rotationSpeed:Number = 3;
 		private var moveControl:PlayMovement;
-		public function Player(player:Pivot3D)	{
+		public function Player(playerObject:Pivot3D,clientServer:Server)	{
 			
-			_player = player;
-			_player.x = 850
-			collisions = new SphereCollision( _player, 50, new Vector3D( 0, 50, 0 ) ); 
-			moveControl = new PlayMovement(this);
+			_player = playerObject;
+			player.x = playerPos.x;
+			player.y = playerPos.y;
+			player.z = playerPos.z;
+			collisions = new SphereCollision( player, 50, new Vector3D( 0, 50, 0 ) ); 
+			moveControl = new PlayMovement(this, clientServer);
 			addAnimations();			
 		}
 		
 		private function addAnimations():void{			
-			_player.addLabel( "run", 1, 40 );
-			_player.addLabel( "idle", 50, 60 );
+			player.addLabel( "run", 1, 40 );
+			player.addLabel( "idle", 50, 60 );
 			// for smooth animation when the frameSpeed property is less than 1.
-			_player.animationPrecision = true;	
+			player.animationPrecision = true;	
 			
 		}
 		
@@ -34,7 +40,8 @@ package{
 			collisions.addCollisionWith( collisionObject );			
 		}
 		
-		public function addPlayerMovement():void{
+		public function move():void{
+			
 			moveControl.move();
 		}
 		
