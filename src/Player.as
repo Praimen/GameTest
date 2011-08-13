@@ -1,4 +1,6 @@
 package{
+	import com.smartfoxserver.v2.entities.User;
+	
 	import flare.collisions.SphereCollision;
 	import flare.core.*;
 	
@@ -9,22 +11,29 @@ package{
 		
 		private var _player:Pivot3D;
 		private var collisions:SphereCollision;
+		private var _user:User;
+		private var _clientServer:Server;
 		
-		
-		private var playerPos:Vector3D = new Vector3D(850,0,0);
+		private var playerPos:Vector3D ;
 		
 		private var animSpeed:Number = 1.5;
 		private var moveSpeed:Number = 20;
 		private var rotationSpeed:Number = 3;
-		private var moveControl:PlayMovement;
-		public function Player(playerObject:Pivot3D,clientServer:Server)	{
-			
+		private var playerMovement:PlayMovement;
+		public function Player(playerObject:Pivot3D,clientServer:Server, user1:User)	{
+			_user = user1;
 			_player = playerObject;
-			player.x = playerPos.x;
-			player.y = playerPos.y;
-			player.z = playerPos.z;
+			_clientServer = clientServer;
+			playerPos = new Vector3D(850,0,0);
+			this.player.x = playerPos.x;
+			this.player.y = playerPos.y;
+			this.player.z = playerPos.z;
+			
+			this.player.name = String(_user.name);
+					
+			
 			collisions = new SphereCollision( player, 50, new Vector3D( 0, 50, 0 ) ); 
-			moveControl = new PlayMovement(this, clientServer);
+			playerMovement = new PlayMovement(this, _clientServer);
 			addAnimations();			
 		}
 		
@@ -42,13 +51,21 @@ package{
 		
 		public function move():void{
 			
-			moveControl.move();
+			playerMovement.move();
 		}
 		
 		public function initAnim():void{
-			moveControl.runIdle();
+			playerMovement.runIdle();
 		}
 		
+		/*public function currentPosition():Vector3D{
+			this.playerPos.x = Number(_user.getVariable(_clientServer.PLAYER_X).getIntValue());
+			this.playerPos.y = Number(_user.getVariable(_clientServer.PLAYER_Y).getIntValue());
+			this.playerPos.z = Number(_user.getVariable(_clientServer.PLAYER_Z).getIntValue());
+			
+			return playerPos;
+		}*/
+///////////////////////////////////getters and setters///////////////////////////////////		
 		public function get player():Pivot3D{
 			return _player;
 		}

@@ -20,6 +20,8 @@ package{
 		private var user:User;
 		private var userName:String
 		private var space:String = "\n"
+		private var _client:Client;
+		private var _serverPlayers:Array;
 		
 		public const PLAYER_X:String = "playerX";
 		public const PLAYER_Y:String = "playerY";
@@ -30,12 +32,12 @@ package{
 		private var statusTxt:String;
 		
 		public function Server(){
-						
+			_serverPlayers = [];			
 			sfs = new SmartFox();
-			startApp();			
+				
 		}
 		
-		private function startApp():void{			
+		public function connectToServer():void{			
 			loadEvents();
 		}
 		
@@ -50,14 +52,15 @@ package{
 			sfs.addEventListener(SFSEvent.CONNECTION, onConnect);
 			sfs.addEventListener(SFSEvent.CONNECTION_LOST, onConnectionLost);
 			sfs.addEventListener(SFSEvent.LOGIN, onLogin);
-			sfs.addEventListener(SFSEvent.ROOM_JOIN, joinRoom);
+			
 			sfs.addEventListener(SFSEvent.ROOM_JOIN_ERROR, onRoomAdded);
-			sfs.addEventListener(SFSEvent.USER_VARIABLES_UPDATE, onUserVarsUpdate)
+			
 			sfs.addEventListener(IOErrorEvent.IO_ERROR, socketError);
 			sfs.addEventListener(SecurityErrorEvent.SECURITY_ERROR, connectError);
 			
 			loadConnect();			
-		}			
+		}
+	
 		
 		private function loadConnect():void{			
 			sfs.loadConfig("http://www.forgegraphics.com/smartfox/config.xml");		
@@ -110,22 +113,9 @@ package{
 			sfs.send(new CreateRoomRequest(settings));
 		}
 		
-		public function joinRoom(sfEvt:SFSEvent):void{			
-			var joinRoom:Room = sfEvt.params.room;			
-			statusTxt = "join "+ joinRoom.name + space;
-			statusTxt = userName + " has joined "+ joinRoom.name+ space;
-			//statusTxt = userName + " PLAYER_X = "+user.getVariable(PLAYER_Z).getIntValue();
-			
-			
-		}
 		
-		private function onUserVarsUpdate(evt:SFSEvent):void{
-			//var changedVars:Array = evt.params.changedVars as Array;
-			//var user:User = evt.params.user as User;
-			var userVars:Array = user.getVariables()
-			//trace(userName + " PLAYER_X = "+ user.getVariable(PLAYER_X).getIntValue());
-			trace("user Variables "+user.getVariable(PLAYER_X).getIntValue());
-		}
+		
+		
 		
 		
 		///////////////////////////////////////////////ERRORS HANDLERS ////////////////////////////////////		
@@ -154,6 +144,27 @@ package{
 		//////////////getter setter/////////////////////////////////
 		public function get output():String{
 			return statusTxt;
+		}
+		
+		public function get smartFox():SmartFox{
+			return sfs;
+		}
+		
+		public function get serverInstance():Server{
+			return this;
+		}
+		
+		public function set client(value:Client):void{
+			_client = value;
+			
+		}
+		
+		public function get client():Client{
+			return _client;
+		}
+		
+		public function get serverPlayers():Array{
+			return _serverPlayers
 		}
 		
 		

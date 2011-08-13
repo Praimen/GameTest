@@ -27,7 +27,7 @@ package
 		private var keyArray:Array;
 		private var _server:Server;
 		
-		private var intervalTimer:Timer = new Timer(500);
+		private var intervalTimer:Timer = new Timer(200);
 		
 		public function PlayMovement(player:Player, clientServer:Server)
 		{
@@ -102,33 +102,33 @@ package
 		}
 		
 		private function playIdle(kEvt:KeyboardEvent):void{
-			trace("key code: "+ kEvt.keyCode);
+			//trace("key code: "+ kEvt.keyCode);
 			
 			
 			switch(kEvt.keyCode){			
 				case 87: 
 					keyArray["up"] = 0;
-					trace("87:" + keyArray["up"]);
+					//trace("87:" + keyArray["up"]);
 					break;
 				case 83: 
 					keyArray["down"] = 0;				
-					trace("83:" + keyArray["down"]);
+					//trace("83:" + keyArray["down"]);
 					break;
 				case 68: 
 					keyArray["right"] = 0;
-					trace("68:" + keyArray["right"]);
+					//trace("68:" + keyArray["right"]);
 					break;
 				case 65: 
 					keyArray["left"] = 0; 
-					trace("65:" + keyArray["left"]);
+					//trace("65:" + keyArray["left"]);
 					break;			
 			}
 			
 			
-			trace("list of key array:"+"\n UP: "+keyArray["up"]+"\n DOWN: "+keyArray["down"]+"\n RIGHT: "+keyArray["right"]+"\n LEFT: "+keyArray["left"]);
+			//trace("list of key array:"+"\n UP: "+keyArray["up"]+"\n DOWN: "+keyArray["down"]+"\n RIGHT: "+keyArray["right"]+"\n LEFT: "+keyArray["left"]);
 			
 			if((keyArray["up"] + keyArray["down"] + keyArray["right"]+ keyArray["left"]) == 0){
-				trace("all movment is false");
+				//trace("all movment is false");
 				runIdle();	
 			}
 			
@@ -144,7 +144,7 @@ package
 		}
 		
 		public function runIdle():void{
-			trace("run idle");
+			//trace("run idle");
 			
 			_player.frameSpeed = .1;
 			_player.playLabel( "idle" );			
