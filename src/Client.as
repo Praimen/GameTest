@@ -54,9 +54,12 @@ package
 		
 		public var statusTxt:TextField;
 		
+		
 		public function Client(singleServe:Server){
 			_server = singleServe; 
 			_server.client = this;
+			
+			
 			view3D = new Viewer3D( this );	
 			
 			// creates the scene.
@@ -67,6 +70,7 @@ package
 			scene.addEventListener( Scene3D.PROGRESS_EVENT, progressEvent );			
 			scene.addEventListener( Scene3D.COMPLETE_EVENT, completeEvent );
 			_server.smartFox.addEventListener(SFSEvent.ROOM_JOIN, joinRoom);
+			
 						
 			Device3D.smoothMaterials = true;		
 			
@@ -194,12 +198,14 @@ package
 			var user:User = evt.params.user as User;
 			var userName:String = user.name;
 			var clientPlayer:Pivot3D = userPlayer.player;
-			var userVars:Array = user.getVariables()			
+			var userVars:Array = user.getVariables();
+				
 			
-				this.clientText(clientPlayer.name + "is Equal to" + userName + ret)
-				/*clientPlayer.x = */this.clientText(Number(user.getVariable(_server.PLAYER_X).getIntValue()));
-				/*clientPlayer.y = */this.clientText(Number(user.getVariable(_server.PLAYER_Y).getIntValue()));
-				/*clientPlayer.z = */this.clientText(Number(user.getVariable(_server.PLAYER_Z).getIntValue()));
+				this.clientText(clientPlayer.name + "is Equal to" + userName + ret);
+				this.clientText("Event Target: " + evt.target + "userVars: " + userVars);
+				/*clientPlayer.x = */this.clientText("player X"+ Number(user.getVariable(_server.PLAYER_X).getIntValue()));
+				/*clientPlayer.y = */this.clientText("player Y"+Number(user.getVariable(_server.PLAYER_Y).getIntValue()));
+				/*clientPlayer.z = */this.clientText("player Z"+Number(user.getVariable(_server.PLAYER_Z).getIntValue()));
 			
 			
 		}
@@ -207,8 +213,7 @@ package
 		private function updateEvent(e:Event):void{
 			scene.canvas.clear();
 			//add player movement logic
-			userPlayer.move();	
-			
+			userPlayer.move();			
 			// once we moved the player, we test for collisions		
 			userPlayer.collision.slider();
 			//rCollisions.slider();			
@@ -220,6 +225,12 @@ package
 			}else{
 				Pivot3DUtils.lookAtWithReference( scene.camera, 0, 200, 0, clientPlayer );
 			}			
+		}
+		
+		
+		
+		private function updatePlayer(tEvt:TimerEvent):void{			
+			
 		}
 		
 		private function clearExtraMesh():void{
@@ -234,8 +245,8 @@ package
 		}
 		
 		public function clientText(message:*):void{
-			
-			statusTxt.appendText(String(message));
+			statusTxt.text = (String(message));
+			//statusTxt.appendText(String(message));
 		}
 		
 		

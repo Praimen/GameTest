@@ -25,8 +25,7 @@ package
 		private var _player:Pivot3D;
 		private var _playerBase:Player;	
 		private var keyArray:Array;
-		private var _server:Server;
-		
+		private var _server:Server;		
 		private var intervalTimer:Timer = new Timer(200);
 		
 		public function PlayMovement(player:Player, clientServer:Server)
@@ -42,7 +41,7 @@ package
 			_player = player.player;
 			StageReference.getStage().addEventListener(KeyboardEvent.KEY_UP, playIdle);	
 			intervalTimer.addEventListener(TimerEvent.TIMER,updateServer);
-			intervalTimer.start();
+			
 			
 			
 		}
@@ -53,7 +52,7 @@ package
 			if (Input3D.keyDown( Input3D.W )){
 				keyArray["up"]=1;
 				_player.frameSpeed = _playerBase.animationSpeed ;
-				_player.translateZ( -_playerBase.movementSpeed  ) ;	
+				_player.translateZ( -_playerBase.movementSpeed  ) ;
 				
 			}	
 		}
@@ -63,7 +62,8 @@ package
 			if (Input3D.keyDown( Input3D.S )){
 				keyArray["down"]=1;
 				_player.frameSpeed = _playerBase.animationSpeed ;
-				_player.translateZ( _playerBase.movementSpeed  ) ;						
+				_player.translateZ( _playerBase.movementSpeed  ) ;	
+					
 			}	
 		}
 		
@@ -91,7 +91,7 @@ package
 				Input3D.keyHit( Input3D.D ) ||
 				Input3D.keyHit( Input3D.A ) ){				
 				_player.playLabel( "run" ) ;				
-				
+				intervalTimer.start();
 			}
 			
 			forward();
@@ -130,11 +130,12 @@ package
 			if((keyArray["up"] + keyArray["down"] + keyArray["right"]+ keyArray["left"]) == 0){
 				//trace("all movment is false");
 				runIdle();	
+				intervalTimer.stop();
 			}
 			
 		}
 		
-		private function updateServer(timerEvt:TimerEvent):void{	
+		private function updateServer(tEvt:TimerEvent):void{	
 			var posVars:Array = new Array()
 				
 			posVars.push(new SFSUserVariable(_server.PLAYER_X, int(_player.x)));

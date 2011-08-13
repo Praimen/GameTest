@@ -8,11 +8,11 @@ package{
 	import com.smartfoxserver.v2.exceptions.SFSError;
 	import com.smartfoxserver.v2.requests.*;
 	
-	import flash.display.Sprite;
+	
 	import flash.events.*;
 	import flash.geom.Vector3D;
 	import flash.system.*;
-	import flash.text.*;
+	
 	
 	public class Server	{
 		
@@ -76,7 +76,7 @@ package{
 			if(sfEvt.params.success){
 				statusTxt = "connection made to:"+  sfs.config.host + ":" + sfs.config.port + space;
 				
-				var request:LoginRequest = new LoginRequest("","","SimpleChat",null);
+				var request:LoginRequest = new LoginRequest("","","SimpleChat");
 				
 				sfs.send(request);
 			}else{
