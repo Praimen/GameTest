@@ -52,7 +52,7 @@ package{
 			sfs.addEventListener(SFSEvent.CONNECTION, onConnect);
 			sfs.addEventListener(SFSEvent.CONNECTION_LOST, onConnectionLost);
 			sfs.addEventListener(SFSEvent.LOGIN, onLogin);
-			
+			sfs.addEventListener(SFSEvent.ROOM_JOIN, joinRoom);
 			sfs.addEventListener(SFSEvent.ROOM_JOIN_ERROR, onRoomAdded);
 			
 			sfs.addEventListener(IOErrorEvent.IO_ERROR, socketError);
@@ -84,6 +84,12 @@ package{
 			}
 		}
 		
+		private function onRoomAdded(sfEvt:SFSEvent):void{			
+			var settings:RoomSettings = new RoomSettings("Game Test");
+			settings.maxUsers = 40;
+			settings.isGame = true;				
+			sfs.send(new CreateRoomRequest(settings));
+		}
 		
 		private function onLogin(sfEvt:SFSEvent):void{					
 			
@@ -106,13 +112,26 @@ package{
 			
 		}		
 		
-		private function onRoomAdded(sfEvt:SFSEvent):void{			
-			var settings:RoomSettings = new RoomSettings("Game Test");
-			settings.maxUsers = 40;
-			settings.isGame = true;				
-			sfs.send(new CreateRoomRequest(settings));
+	
+		public function joinRoom(sfEvt:SFSEvent):void{			
+			var joinRoom:Room = sfEvt.params.room;	
+			
+			
+			this.userClient.clientText("join "+ joinRoom.name);
+			
+			
+			for each (var u:User in joinRoom.userList){	
+				
+				serverPlayers.push(u);
+				this.userClient.clientText(u.name + "'s Array length: " + serverPlayers.length);
+				
+			}
+			
+			this.userClient.addPlayers();
+			this.userClient.loadPlayerCamera();
+			this.userClient.addEvent();
+			
 		}
-		
 		
 		
 		
@@ -154,12 +173,12 @@ package{
 			return this;
 		}
 		
-		public function set client(value:Client):void{
+		public function set userClient(value:Client):void{
 			_client = value;
 			
 		}
 		
-		public function get client():Client{
+		public function get userClient():Client{
 			return _client;
 		}
 		

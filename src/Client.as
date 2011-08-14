@@ -57,7 +57,7 @@ package
 		
 		public function Client(singleServe:Server){
 			_server = singleServe; 
-			_server.client = this;
+			
 			
 			
 			view3D = new Viewer3D( this );	
@@ -69,7 +69,7 @@ package
 			// define progress and complete events.
 			scene.addEventListener( Scene3D.PROGRESS_EVENT, progressEvent );			
 			scene.addEventListener( Scene3D.COMPLETE_EVENT, completeEvent );
-			_server.smartFox.addEventListener(SFSEvent.ROOM_JOIN, joinRoom);
+			
 			
 						
 			Device3D.smoothMaterials = true;		
@@ -159,25 +159,7 @@ package
 			_server.connectToServer();
 		}
 		
-		public function joinRoom(sfEvt:SFSEvent):void{			
-			var joinRoom:Room = sfEvt.params.room;	
-			
-			
-			this.clientText("join "+ joinRoom.name);
-			
-			
-			for each (var u:User in joinRoom.userList){	
-				
-				_server.serverPlayers.push(u);
-				this.clientText(u.name + "'s Array length: " + _server.serverPlayers.length);
-				
-			}
-			
-			addPlayers();
-			loadPlayerCamera();
-			addEvent();
-			
-		}
+		
 		
 		public function addEvent():void{		
 			_server.smartFox.addEventListener(SFSEvent.USER_VARIABLES_UPDATE, onUserVarsUpdate)
@@ -253,6 +235,14 @@ package
 		/////////////////////////////getter and setter//////////////////////////
 		public function get server():Server{
 			return _server;
+		}
+		
+		public function set userName(value:User):void{			
+			_user = value;
+		}
+		
+		public function get userClient():Client{
+			return this;
 		}
 		
 	
