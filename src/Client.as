@@ -57,7 +57,7 @@ package
 		
 		public function Client(singleServe:Server){
 			_server = singleServe; 
-			
+			_server.userClient = this;
 			
 			
 			view3D = new Viewer3D( this );	
@@ -69,6 +69,9 @@ package
 			// define progress and complete events.
 			scene.addEventListener( Scene3D.PROGRESS_EVENT, progressEvent );			
 			scene.addEventListener( Scene3D.COMPLETE_EVENT, completeEvent );
+			//_server.smartFox.addEventListener(SFSEvent.ROOM_JOIN, addPlayers);
+			_server.smartFox.addEventListener(SFSEvent.USER_ENTER_ROOM, addPlayers)
+			
 			
 			
 						
@@ -118,17 +121,34 @@ package
 			
 		}
 		
-		public function addPlayers():void{			
-			//biped.getChildByName("draken");
-			for each(var serverUser:User in _server.serverPlayers){
-				
-				userPlayer = new Player(biped.clone(),server,serverUser);
-				userPlayer.player.name = serverUser.name;
+		public function addUserPlayer():void{			
+			//biped.getChildByName("draken");				
+				userPlayer = new Player(biped,this.server,this.user);
+				userPlayer.player.name = this.user.name;
 				userPlayer.initAnim();
 				userPlayer.addCollisions(level);			
 				clientPlayer = userPlayer.player;
+				clientPlayer.name = String(this.user.name)
 				scene.addChild(clientPlayer);
-			}
+			
+		}
+		
+		private function addPlayers(sfEvent:SFSEvent):void{
+			var serverUser:User = User(sfEvent.params.user);
+			
+			clientText("addPlayers function: "+ serverUser.isItMe);			
+						
+				if (!serverUser.isItMe){
+					var otherPlayer:Player = new Player(biped.clone(),this.server,serverUser);
+					otherPlayer.player.name = serverUser.name;
+					otherPlayer.initAnim();
+					otherPlayer.addCollisions(level);
+					var otherUserPlayer:Pivot3D = new Pivot3D(serverUser.name);
+					otherUserPlayer = otherPlayer.player;				
+					scene.addChild(otherUserPlayer);					
+				}
+			
+			
 		}
 		
 		private function progressEvent(e:Event):void {
@@ -183,11 +203,11 @@ package
 			var userVars:Array = user.getVariables();
 				
 			
-				this.clientText(clientPlayer.name + "is Equal to" + userName + ret);
-				this.clientText("Event Target: " + evt.target + "userVars: " + userVars);
-				/*clientPlayer.x = */this.clientText("player X"+ Number(user.getVariable(_server.PLAYER_X).getIntValue()));
-				/*clientPlayer.y = */this.clientText("player Y"+Number(user.getVariable(_server.PLAYER_Y).getIntValue()));
-				/*clientPlayer.z = */this.clientText("player Z"+Number(user.getVariable(_server.PLAYER_Z).getIntValue()));
+				/*this.clientText(clientPlayer.name + "is Equal to" + userName + ret);*/
+				/*this.clientText("Event Target: " + evt.target + "userVars: " + userVars);*/
+				/*clientPlayer.x = this.clientText("player X"+ Number(user.getVariable(_server.PLAYER_X).getIntValue()));*/
+				/*clientPlayer.y = this.clientText("player Y"+Number(user.getVariable(_server.PLAYER_Y).getIntValue()));*/
+				/*clientPlayer.z = this.clientText("player Z"+Number(user.getVariable(_server.PLAYER_Z).getIntValue()));*/
 			
 			
 		}
@@ -227,8 +247,8 @@ package
 		}
 		
 		public function clientText(message:*):void{
-			statusTxt.text = (String(message));
-			//statusTxt.appendText(String(message));
+			//statusTxt.text = (String(message));
+			statusTxt.appendText(String(message));
 		}
 		
 		
@@ -237,13 +257,15 @@ package
 			return _server;
 		}
 		
-		public function set userName(value:User):void{			
+		public function set user(value:User):void{			
 			_user = value;
 		}
 		
-		public function get userClient():Client{
-			return this;
+		public function get user():User{			
+			return _user;
 		}
+		
+		
 		
 	
 		

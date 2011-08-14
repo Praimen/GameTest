@@ -11,7 +11,7 @@ package{
 		
 		private var _player:Pivot3D;
 		private var collisions:SphereCollision;
-		private var _user:User;
+		private var _user:String;
 		private var _clientServer:Server;
 		
 		private var playerPos:Vector3D ;
@@ -21,7 +21,7 @@ package{
 		private var rotationSpeed:Number = 3;
 		private var playerMovement:PlayMovement;
 		public function Player(playerObject:Pivot3D,clientServer:Server, user1:User)	{
-			_user = user1;
+			_user = user1.name;
 			_player = playerObject;
 			_clientServer = clientServer;
 			playerPos = new Vector3D(850,0,0);
@@ -29,8 +29,7 @@ package{
 			this.player.y = playerPos.y;
 			this.player.z = playerPos.z;
 			
-			this.player.name = String(_user.name);
-					
+			this.player.name = _user;					
 			
 			collisions = new SphereCollision( player, 50, new Vector3D( 0, 50, 0 ) ); 
 			playerMovement = new PlayMovement(this, _clientServer);

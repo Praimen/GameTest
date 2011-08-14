@@ -8,13 +8,12 @@ package{
 	import com.smartfoxserver.v2.exceptions.SFSError;
 	import com.smartfoxserver.v2.requests.*;
 	
-	
 	import flash.events.*;
 	import flash.geom.Vector3D;
 	import flash.system.*;
 	
 	
-	public class Server	{
+	public class Server extends EventDispatcher	{
 		
 		public var sfs:SmartFox;
 		private var user:User;
@@ -97,7 +96,7 @@ package{
 			
 			if(sfEvt.params.user != null){
 				user = User(sfEvt.params.user);
-				
+			
 				userName = user.name;
 				statusTxt = "UserName: " + userName + space;	
 				
@@ -114,22 +113,25 @@ package{
 		
 	
 		public function joinRoom(sfEvt:SFSEvent):void{			
-			var joinRoom:Room = sfEvt.params.room;	
-			
-			
-			this.userClient.clientText("join "+ joinRoom.name);
-			
-			
-			for each (var u:User in joinRoom.userList){	
+			var joinRoom:Room = sfEvt.params.room;
+			this.userClient.user = user;
+			for each (var u:User in joinRoom.userList){
 				
-				serverPlayers.push(u);
-				this.userClient.clientText(u.name + "'s Array length: " + serverPlayers.length);
+				serverPlayers.push(this.userClient);
+			}
 				
+				//this.userClient.clientText(u.name + "'s Array length: " + serverPlayers.length);
+			
+			for each (var c:Client in serverPlayers){	
+				var cUser:User = c.user;
+				c.clientText("join "+ joinRoom.name);
+				//c.clientText(c.user.name + "'s Array length: " + serverPlayers.length);
+				c.addUserPlayer();
+				c.loadPlayerCamera();
+				c.addEvent();
 			}
 			
-			this.userClient.addPlayers();
-			this.userClient.loadPlayerCamera();
-			this.userClient.addEvent();
+			
 			
 		}
 		
